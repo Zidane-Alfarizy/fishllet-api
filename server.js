@@ -5,6 +5,11 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ✅ Base URL untuk gambar (otomatis detect production/development)
+const BASE_URL = process.env.RAILWAY_PUBLIC_DOMAIN 
+  ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+  : `http://localhost:${PORT}`;
+
 // ════════════════════════════════════════════════════════════════
 // MIDDLEWARE
 // ════════════════════════════════════════════════════════════════
@@ -28,7 +33,7 @@ const products = [
     id: "1",
     idMeal: "1",
     strMeal: "Gurame Segar",
-    strMealThumb: "http://10.0.2.2:3000/images/6.png",
+    strMealThumb: `${BASE_URL}/images/6.png`,
     strCategory: "Ikan Air Tawar",
     strArea: "Indonesia",
     strInstructions: "Gurame segar pilihan untuk berbagai masakan. Bisa digoreng, dibakar, atau dikukus.",
@@ -41,7 +46,7 @@ const products = [
     id: "2",
     idMeal: "2",
     strMeal: "Udang Segar",
-    strMealThumb: "http://10.0.2.2:3000/images/8.png",
+    strMealThumb: `${BASE_URL}/images/8.png`,
     strCategory: "Seafood",
     strArea: "Indonesia",
     strInstructions: "Udang segar pilihan untuk berbagai masakan seafood. Cocok untuk tumis, bakar, atau goreng tepung.",
@@ -54,7 +59,7 @@ const products = [
     id: "3",
     idMeal: "3",
     strMeal: "Cumi Ring",
-    strMealThumb: "http://10.0.2.2:3000/images/Cumi Ring.png",
+    strMealThumb: `${BASE_URL}/images/Cumi Ring.png`,
     strCategory: "Seafood",
     strArea: "Indonesia",
     strInstructions: "Cumi ring siap pakai, tinggal goreng dengan tepung crispy. Sempurna untuk camilan atau lauk.",
@@ -67,7 +72,7 @@ const products = [
     id: "4",
     idMeal: "4",
     strMeal: "Cumi Tube",
-    strMealThumb: "http://10.0.2.2:3000/images/Cumi Tube.png",
+    strMealThumb: `${BASE_URL}/images/Cumi Tube.png`,
     strCategory: "Seafood",
     strArea: "Indonesia",
     strInstructions: "Cumi tube fresh, cocok untuk isi atau diiris untuk tumisan. Tekstur kenyal dan lezat.",
@@ -80,7 +85,7 @@ const products = [
     id: "5",
     idMeal: "5",
     strMeal: "Ikan Dori",
-    strMealThumb: "http://10.0.2.2:3000/images/Dori.png",
+    strMealThumb: `${BASE_URL}/images/Dori.png`,
     strCategory: "Ikan Laut",
     strArea: "Indonesia",
     strInstructions: "Ikan dori fillet tanpa duri, sangat cocok untuk anak-anak. Bisa digoreng tepung atau dikukus.",
@@ -93,7 +98,7 @@ const products = [
     id: "6",
     idMeal: "6",
     strMeal: "Gurita Cut",
-    strMealThumb: "http://10.0.2.2:3000/images/Gurita Cut.png",
+    strMealThumb: `${BASE_URL}/images/Gurita Cut.png`,
     strCategory: "Seafood",
     strArea: "Indonesia",
     strInstructions: "Gurita sudah dipotong-potong siap masak. Cocok untuk tumis atau bakar dengan saus pedas.",
@@ -106,7 +111,7 @@ const products = [
     id: "7",
     idMeal: "7",
     strMeal: "Kakap Merah",
-    strMealThumb: "http://10.0.2.2:3000/images/Kakap.png",
+    strMealThumb: `${BASE_URL}/images/Kakap.png`,
     strCategory: "Ikan Laut",
     strArea: "Indonesia",
     strInstructions: "Kakap merah segar dari laut Indonesia. Daging tebal, cocok untuk bakar atau goreng bumbu.",
@@ -119,7 +124,7 @@ const products = [
     id: "8",
     idMeal: "8",
     strMeal: "Ikan Nila",
-    strMealThumb: "http://10.0.2.2:3000/images/Nila.png",
+    strMealThumb: `${BASE_URL}/images/Nila.png`,
     strCategory: "Ikan Air Tawar",
     strArea: "Indonesia",
     strInstructions: "Nila segar dari kolam terpilih. Harga ekonomis, rasa tetap enak. Cocok untuk digoreng atau dibakar.",
@@ -273,13 +278,15 @@ app.use((req, res) => {
 // START SERVER
 // ════════════════════════════════════════════════════════════════
 app.listen(PORT, '0.0.0.0', () => {
+  const isProduction = process.env.RAILWAY_PUBLIC_DOMAIN ? true : false;
+  const serverUrl = isProduction ? BASE_URL : `http://localhost:${PORT}`;
+  
   console.log(`
   ╔════════════════════════════════════════════════════════════════╗
   ║                                                                ║
   ║  🐟 FISHLLET PUBLIC API - CUSTOM PRODUCTS                      ║
-  ║  📡 Server running on http://localhost:${PORT}                   ║
-  ║  🌐 Network: http://0.0.0.0:${PORT} (accessible from network)    ║
-  ║  📱 Android Emulator: http://10.0.2.2:${PORT}                    ║
+  ║  📡 Server running on: ${serverUrl.padEnd(40)} ║
+  ║  🌐 Environment: ${(isProduction ? 'PRODUCTION (Railway)' : 'DEVELOPMENT').padEnd(42)} ║
   ║  🗄️  Data: In-Memory (${products.length} products)                           ║
   ║  🔓 Access: PUBLIC (No authentication)                         ║
   ║                                                                ║
@@ -305,7 +312,7 @@ app.listen(PORT, '0.0.0.0', () => {
   ║  GET  /api/categories/:category      - By category             ║
   ║  GET  /api/health                    - Health check            ║
   ║                                                                ║
-  ║  🧪 Test it: http://localhost:${PORT}/api/products               ║
+  ║  🧪 Test it: ${serverUrl}/api/products${' '.repeat(Math.max(0, 27 - serverUrl.length))} ║
   ║                                                                ║
   ╚════════════════════════════════════════════════════════════════╝
   `);
